@@ -14,7 +14,12 @@ provider "azurerm" {
   client_secret   = var.client_secret
   tenant_id       = "81fa766e-a349-4867-8bf4-ab35e250a08f"
 }
-
+terraform {
+  backend "azurerm" {
+   feature {
+    }
+  }
+}
 module "azurerm_virtual_network"  {
   source = "./modules/vnet"
   name                = "k8-network"
