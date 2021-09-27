@@ -6,9 +6,8 @@ on:
 
 jobs:
   pre-check-dev-infrastructure:
-    name: 'Terraform Plan'
+    name: 'Pre-check-dev-infrastructure'
     runs-on: ubuntu-latest
-    environment: "Terraform-Plan"
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -39,7 +38,7 @@ jobs:
       run: terraform plan -out out.plan -no-color -var 'client_secret=${{ secrets.AZURE_AD_CLIENT_SECRET }}' 
   
   deploy-dev-infrastructure:
-    name: 'Terraform Apply'
+    name: 'Deploy-dev-infrastructure'
     runs-on: ubuntu-latest
     environment: "dev"
     needs: "pre-check-dev-infrastructure"
@@ -69,7 +68,7 @@ jobs:
         run: terraform -chdir="." apply -auto-approve -var 'client_secret=${{ secrets.AZURE_AD_CLIENT_SECRET }}'
   
   deploy-prod-infrastructure:
-    name: 'Terraform Apply'
+    name: 'Deploy-prod-infrastructure'
     runs-on: ubuntu-latest
     environment: "prod"
     needs: "deploy-dev-infrastructure"
