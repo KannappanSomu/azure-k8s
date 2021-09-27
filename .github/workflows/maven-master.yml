@@ -2,7 +2,7 @@ name: Master Branch
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
 
 jobs:
   pre-check-infrastructure:
