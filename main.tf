@@ -20,6 +20,8 @@ terraform {
     }
   }
 }
+
+
 module "azurerm_virtual_network"  {
   source = "./modules/vnet"
   name                = "k8-network"
@@ -57,11 +59,26 @@ provider "kubectl" {
 
 }
 
-data "kubectl_path_documents" "manifests" {
-    pattern = "${path.module}/manifests/*.yaml"
+module prime_secrets {
+  source     = "./modules/key_vault"
+  location            = "West Europe"
+  resource_group_name = "kubernetes-rg"
+  depends_on = [module.azurerm_virtual_network]
 }
 
-resource "kubectl_manifest" "test" {
-    count     = length(data.kubectl_path_documents.manifests.documents)
-    yaml_body = element(data.kubectl_path_documents.manifests.documents, count.index)
+resource "random_password" "postgres_user_password" {
+  depends_on = [module.prime_secrets]
+  length     = 8
+  special    = false
+  #override_special = "_%@"
+  keepers = {
+    # Generate a new password each time we switch to a new environment and org
+    environment = var.environment
+  }
+}
+resource "azurerm_key_vault_secret" "postgres_user_password" {
+  depends_on   = [random_password.postgres_user_password]
+  name         = "postgres-user-password"
+  value        = random_password.postgres_user_password.result
+  key_vault_id = module.prime_secrets.key_vault_id
 }
