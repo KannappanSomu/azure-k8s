@@ -81,4 +81,14 @@ resource "azurerm_key_vault_secret" "postgres_user_password" {
   name         = "postgres-user-password"
   value        = random_password.postgres_user_password.result
   key_vault_id = module.prime_secrets.key_vault_id
+  content_type = "password"
+}
+data "kubectl_path_documents" "manifests" {
+    pattern = "${path.module}/manifests/*.yaml"
+}
+
+
+resource "kubectl_manifest" "test" {
+    count     = length(data.kubectl_path_documents.manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.manifests.documents, count.index)
 }

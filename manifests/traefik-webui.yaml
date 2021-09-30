@@ -20,7 +20,7 @@ metadata:
     name: traefikweb-web-ui
 spec:
   rules:
-  - host: traefik-ui.guardians.com
+  - host: traefik-ui.com
     http:
       paths:
       - pathType: Prefix
